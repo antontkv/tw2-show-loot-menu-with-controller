@@ -22,27 +22,52 @@ function HandleKeyEvent(isPressed, keyID)
 }
 function OnPadInput(val)
 {
-   trace(" -> " + val);
-   if(val == 143)
+   // Take All Items
+   if(val == 138) // X button
+   {
+      // This check for when the game loads first time.
+      // For some reason when pressing X to loot container for the first time after load, it will be looted immediately,
+      // because one key press will be registered as two. When this script initiates it sets lastPressedKey to 0, this
+      // serves as indication that we opening first container after load. If the script detects X as last input, and
+      // previous key was not set, it will do nothing. So we don't get double button click.
+      if(lastPressedKey != 0)
+      {
+         getItem(1);
+      }
+   }
+   // Select Down
+   if(val == 40) // Down button
    {
       selectedId += 1;
    }
-   if(val == 142)
+   // Select Up
+   if(val == 38) // Up button
    {
       selectedId -= 1;
    }
-   if(val == 136)
+   // Take Item
+   if(val == 136) // A button
    {
       getItem(selectedId);
    }
-   if(selectedId < 1)
+   // Close
+   if(val == 137) // B button
+   {
+      // This should be external call to container_class.ws function and not call to local Close function.
+      // HideLootWindow does much more then simple closes loot window.
+      flash.external.ExternalInterface.call("HideLootWindow");
+   }
+   // Loop selection
+   if(selectedId < 2)
    {
       selectedId = HowMany;
    }
    if(selectedId > HowMany)
    {
-      selectedId = 1;
+      selectedId = 2;
    }
+   // Record key pressed
+   lastPressedKey = val;
 }
 function getItem(item)
 {
@@ -87,7 +112,7 @@ function Close()
 function Show()
 {
 }
-function setItems(Weight, maxWeight, allItems, RName2, Name2, Quant2, Id2, ItIcon2, ItWeight2, ItGlow2, RName3, Name3, Quant3, Id3, ItIcon3, ItWeight3, ItGlow3, RName4, Name4, Quant4, Id4, ItIcon4, ItWeight4, ItGlow4, RName5, Name5, Quant5, Id5, ItIcon5, ItWeight5, ItGlow5, RName6, Name6, Quant6, Id6, ItIcon6, ItWeight6, ItGlow6, RName7, Name7, Quant7, Id7, ItIcon7, ItWeight7, ItGlow7, RName8, Name8, Quant8, Id8, ItIcon8, ItWeight8, ItGlow8)
+function setItems(Weight, maxWeight, allItems, isUsingPad, RName2, Name2, Quant2, Id2, ItIcon2, ItWeight2, ItGlow2, RName3, Name3, Quant3, Id3, ItIcon3, ItWeight3, ItGlow3, RName4, Name4, Quant4, Id4, ItIcon4, ItWeight4, ItGlow4, RName5, Name5, Quant5, Id5, ItIcon5, ItWeight5, ItGlow5, RName6, Name6, Quant6, Id6, ItIcon6, ItWeight6, ItGlow6, RName7, Name7, Quant7, Id7, ItIcon7, ItWeight7, ItGlow7, RName8, Name8, Quant8, Id8, ItIcon8, ItWeight8, ItGlow8)
 {
    uiLootTable._visible = false;
    uiLootTable.gotoAndStop(1);
@@ -109,6 +134,14 @@ function setItems(Weight, maxWeight, allItems, RName2, Name2, Quant2, Id2, ItIco
    Object(this).uiLootTable.fxItem07._visible = false;
    Object(this).uiLootTable.fxItem08._visible = false;
    Object(this).uiLootTable.fxWeight._visible = true;
+   if(isUsingPad == 1)
+   {
+      selectedId = 2;
+   }
+   else
+   {
+      selectedId = 0;
+   }
    Object(this).uiLootTable.lbWeight.text = Weight + "/" + maxWeight;
    Item1_Name = allItems;
    Item2_Name = Name2;
@@ -296,10 +329,15 @@ this.onMouseUp = function()
 {
    isMouseDown = false;
 };
-var selectedId = 1;
+var selectedId = 0;
+var lastPressedKey = 0;
 var keyLis = new Object();
 keyLis.onKeyDown = function()
 {
+   if(uiLootTable._visible)
+   {
+      OnPadInput(Key.getCode());
+   }
    if(Key.getCode() == 27)
    {
       if(uiLootTable._visible)
@@ -471,6 +509,10 @@ this.onEnterFrame = function()
       uiLootTable.fxItem06._visible = false;
       uiLootTable.fxItem07._visible = false;
       uiLootTable.fxItem08._visible = false;
+      if(HowMany == 1)
+      {
+         selectedId = 0;
+      }
       if(HowMany > 0)
       {
          uiLootTable.fxItem01._visible = true;
@@ -513,7 +555,7 @@ this.onEnterFrame = function()
             getItem(1);
          }
       }
-      if(HowMany > 1 && uiLootTable.fxItem02.sel.hitTest(MX,MY))
+      if(HowMany > 1 && uiLootTable.fxItem02.sel.hitTest(MX,MY) || selectedId == 2)
       {
          iselected = 2;
          uiLootTable.fxItem02.sel._alpha = 50;
@@ -522,7 +564,7 @@ this.onEnterFrame = function()
             getItem(2);
          }
       }
-      if(HowMany > 2 && uiLootTable.fxItem03.sel.hitTest(MX,MY))
+      if(HowMany > 2 && uiLootTable.fxItem03.sel.hitTest(MX,MY) || selectedId == 3)
       {
          iselected = 3;
          uiLootTable.fxItem03.sel._alpha = 50;
@@ -531,7 +573,7 @@ this.onEnterFrame = function()
             getItem(3);
          }
       }
-      if(HowMany > 3 && uiLootTable.fxItem04.sel.hitTest(MX,MY))
+      if(HowMany > 3 && uiLootTable.fxItem04.sel.hitTest(MX,MY) || selectedId == 4)
       {
          iselected = 4;
          uiLootTable.fxItem04.sel._alpha = 50;
@@ -540,7 +582,7 @@ this.onEnterFrame = function()
             getItem(4);
          }
       }
-      if(HowMany > 4 && uiLootTable.fxItem05.sel.hitTest(MX,MY))
+      if(HowMany > 4 && uiLootTable.fxItem05.sel.hitTest(MX,MY) || selectedId == 5)
       {
          iselected = 5;
          uiLootTable.fxItem05.sel._alpha = 50;
@@ -549,7 +591,7 @@ this.onEnterFrame = function()
             getItem(5);
          }
       }
-      if(HowMany > 5 && uiLootTable.fxItem06.sel.hitTest(MX,MY))
+      if(HowMany > 5 && uiLootTable.fxItem06.sel.hitTest(MX,MY) || selectedId == 6)
       {
          iselected = 6;
          uiLootTable.fxItem06.sel._alpha = 50;
@@ -558,7 +600,7 @@ this.onEnterFrame = function()
             getItem(6);
          }
       }
-      if(HowMany > 6 && uiLootTable.fxItem07.sel.hitTest(MX,MY))
+      if(HowMany > 6 && uiLootTable.fxItem07.sel.hitTest(MX,MY) || selectedId == 7)
       {
          iselected = 7;
          uiLootTable.fxItem07.sel._alpha = 50;
@@ -567,7 +609,7 @@ this.onEnterFrame = function()
             getItem(7);
          }
       }
-      if(HowMany > 7 && uiLootTable.fxItem08.sel.hitTest(MX,MY))
+      if(HowMany > 7 && uiLootTable.fxItem08.sel.hitTest(MX,MY) || selectedId == 8)
       {
          iselected = 8;
          uiLootTable.fxItem08.sel._alpha = 50;

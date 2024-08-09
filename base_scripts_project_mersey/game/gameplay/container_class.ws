@@ -192,7 +192,10 @@ class CContainer extends CGameplayEntity
 		
 		if ( thePlayer.IsDead() ) return false;
 		
-		if ( theGame.IsUsingPad() || showInventoryAfterUse ) 
+		// Show Loot Window with Controller +++
+		// if ( theGame.IsUsingPad() || showInventoryAfterUse ) // original line
+		if ( showInventoryAfterUse )
+		// Show Loot Window with Controller ---
 		{
 			TakeAllItems();
 			QuestItemGlow();
@@ -273,6 +276,17 @@ class CContainer extends CGameplayEntity
 		args.PushBack( FlashValueFromInt( RoundF( thePlayer.GetCurrentWeight() ) ) );
 		args.PushBack( FlashValueFromInt( RoundF( thePlayer.GetMaxWeight() ) ) );
 		args.PushBack( FlashValueFromString( GetLocStringByKeyExt("ContTakeAll") ) );
+
+		// Show Loot Window with Controller +++
+		if ( theGame.IsUsingPad() )
+		{
+			args.PushBack( FlashValueFromInt( 1 ) );
+		}
+		else
+		{
+			args.PushBack( FlashValueFromInt( 0 ) );
+		}
+		// Show Loot Window with Controller ---
 		
 		if ( numShownItems< 8 ) // panel loot  - quest items
 		for ( i = allItems.Size()-1; i >= 0; i -= 1 )
