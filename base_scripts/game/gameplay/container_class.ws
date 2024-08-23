@@ -192,10 +192,7 @@ class CContainer extends CGameplayEntity
 		
 		if ( thePlayer.IsDead() ) return false;
 		
-		// Show Loot Window with Controller +++
-		// if ( theGame.IsUsingPad() || showInventoryAfterUse ) // original line
-		if ( showInventoryAfterUse )
-		// Show Loot Window with Controller ---
+		if ( showInventoryAfterUse )  // Show Loot Window with Controller: Remove `theGame.IsUsingPad() ||`
 		{
 			TakeAllItems();
 			QuestItemGlow();
@@ -279,13 +276,9 @@ class CContainer extends CGameplayEntity
 		
 		// Show Loot Window with Controller +++
 		if ( theGame.IsUsingPad() )
-		{
 			args.PushBack( FlashValueFromInt( 1 ) );
-		}
 		else
-		{
 			args.PushBack( FlashValueFromInt( 0 ) );
-		}
 		// Show Loot Window with Controller ---
 		
 		if ( numShownItems< 8 ) // panel loot  - quest items
